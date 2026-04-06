@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Complete Your Profile - Pulse</title>
+  <title>Complete Profile - Pulse</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,21 +13,17 @@
       <img src="profile.jpg" alt="Pulse" class="profile-pic-small">
       <span>Pulse</span>
     </div>
+    <div id="clerk-user-btn"></div>
   </nav>
 
   <div class="profile-setup-container">
     <div class="profile-card">
-      <h1>👋 Welcome to Pulse!</h1>
-      <p>Let's set up your profile to get started</p>
+      <h1>👋 Welcome, <span id="userName">User</span>!</h1>
+      <p>Let's customize your tracking experience</p>
 
       <form id="profileForm" class="profile-form">
         <div class="form-section">
-          <h3>Basic Info</h3>
-          <div class="form-group">
-            <label>Display Name</label>
-            <input type="text" id="displayName" required placeholder="How should we call you?">
-          </div>
-          
+          <h3>Preferences</h3>
           <div class="form-group">
             <label>Timezone</label>
             <select id="timezone" required>
@@ -42,38 +38,19 @@
         </div>
 
         <div class="form-section">
-          <h3>Your Goals</h3>
-          <div class="form-group">
-            <label>What do you want to track? (Select all that apply)</label>
-            <div class="checkbox-group">
-              <label class="checkbox-label">
-                <input type="checkbox" name="goals" value="habits">
-                <span>📋 Daily Habits</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="goals" value="sleep">
-                <span>😴 Sleep Quality</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="goals" value="learning">
-                <span>📚 Learning Time</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="goals" value="fitness">
-                <span>💪 Fitness/Exercise</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="goals" value="productivity">
-                <span>⚡ Productivity</span>
-              </label>
-            </div>
+          <h3>What do you want to track?</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-label"><input type="checkbox" name="goals" value="habits" checked><span>📋 Daily Habits</span></label>
+            <label class="checkbox-label"><input type="checkbox" name="goals" value="sleep" checked><span>😴 Sleep Quality</span></label>
+            <label class="checkbox-label"><input type="checkbox" name="goals" value="learning" checked><span>📚 Learning Time</span></label>
+            <label class="checkbox-label"><input type="checkbox" name="goals" value="fitness"><span>💪 Fitness</span></label>
+            <label class="checkbox-label"><input type="checkbox" name="goals" value="productivity"><span>⚡ Productivity</span></label>
           </div>
         </div>
 
         <div class="form-section">
-          <h3>First Goal</h3>
+          <h3>Your #1 Goal Right Now</h3>
           <div class="form-group">
-            <label>What's your #1 goal right now?</label>
             <input type="text" id="mainGoal" placeholder="e.g., Build a consistent morning routine">
           </div>
         </div>
@@ -85,7 +62,7 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/@clerk/clerk-js@5/dist/clerk.browser.js"></script>
   <script src="config.js"></script>
   <script src="profile.js"></script>
 </body>
