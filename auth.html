@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-body">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <img src="profile.jpg" alt="Pulse" class="auth-logo">
+        <h1>Join Pulse</h1>
+        <p>Track your life, own your progress</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="showTab('signin')">Sign In</button>
+        <button class="auth-tab" onclick="showTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="signinForm" class="auth-form">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="signinEmail" required placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signinPassword" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+        <div class="auth-divider">
+          <span>OR</span>
+        </div>
+        <button type="button" onclick="signInWithGoogle()" class="btn btn-google btn-full">
+          <img src="https://www.google.com/favicon.ico" alt="Google"> Continue with Google
+        </button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="signupForm" class="auth-form" style="display:none;">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="signupName" required placeholder="Asym Alwali">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="signupEmail" required placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label>Password (min 6 characters)</label>
+          <input type="password" id="signupPassword" required minlength="6" placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+        <div class="auth-divider">
+          <span>OR</span>
+        </div>
+        <button type="button" onclick="signInWithGoogle()" class="btn btn-google btn-full">
+          <img src="https://www.google.com/favicon.ico" alt="Google"> Continue with Google
+        </button>
+      </form>
+
+      <div id="authError" class="auth-error"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>
