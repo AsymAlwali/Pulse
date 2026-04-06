@@ -18,31 +18,40 @@ window.addEventListener('DOMContentLoaded', async () => {
   updateDailyCheckIn();
 });
 
-// Check authentication
-async function checkAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  
-  if (!session) {
+// At top of dashboard.js
+let currentUser = null;
+let userData = { habits: [], sleep: [], learning: [], goals: [], streak: 0, last_active: null, activity: [] };
+
+window.addEventListener('DOMContentLoaded', async () => {
+  // Auth guard
+  if (!window.Clerk.user) {
     window.location.href = 'auth.html';
     return;
   }
+  currentUser = window.Clerk.user;
   
-  currentUser = session.user;
-  updateUserInfo();
-}
+  // Mount user button
+  const userBtn = document.getElementById('clerk-user-btn');
+  if (userBtn) await window.Clerk.mountUserButton(userBtn);
 
-function updateUserInfo() {
-  const userInfo = document.getElementById('userInfo');
-  const name = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
-  userInfo.innerHTML = `
-    <span>Welcome, ${name}</span>
-    <button onclick="signOut()" class="btn btn-small btn-secondary">Sign Out</button>
-  `;
-}
+  await loadUserData();
+  calculateStreak();
+  renderAll();
+  updateDailyCheckIn();
+});
 
-async function signOut() {
-  await supabase.auth.signOut();
-  window.location.href = 'auth.html';
+// Replace all supabase.auth.getSession() calls with:
+// const userId = window.Clerk.user.id;
+
+// Example loadUserData:
+async function loadUserData() {
+  const { data, error } = await window.supabase
+    .from('user_data')
+    .select('data')
+    .eq('user_id', window.Clerk.user.id)
+    .single();
+  
+  if (data) userData = data.data;
 }
 
 // Load user data from Supabase
