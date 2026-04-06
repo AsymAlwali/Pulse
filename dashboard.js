@@ -3,85 +3,52 @@ let userData = {
   habits: [],
   sleep: [],
   learning: [],
-  goals: []
+  goals: [],
+  streak: 0,
+  last_active: null,
+  activity: []
 };
 
 // Initialize app
-document.addEventListener('DOMContentLoaded', () => {
-  checkAuth();
-  loadUserData();
+window.addEventListener('DOMContentLoaded', async () => {
+  await checkAuth();
+  await loadUserData();
+  calculateStreak();
   renderAll();
+  updateDailyCheckIn();
 });
 
-// Auth Functions
+// Check authentication
 async function checkAuth() {
   const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    updateUserInfo();
-  }
-}
-
-function showAuthModal() {
-  document.getElementById('authModal').classList.add('active');
-}
-
-function closeAuthModal() {
-  document.getElementById('authModal').classList.remove('active');
-}
-
-async function signInWithGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: window.location.origin + '/dashboard.html'
-    }
-  });
-  if (error) alert('Error signing in: ' + error.message);
-}
-
-async function signInWithEmail() {
-  const email = prompt('Enter your email:');
-  if (!email) return;
   
-  const { error } = await supabase.auth.signInWithOtp({
-    email: email
-  });
-    if (error) {
-    alert('Error: ' + error.message);
-  } else {
-    alert('Check your email for the magic link!');
+  if (!session) {
+    window.location.href = 'auth.html';
+    return;
   }
+  
+  currentUser = session.user;
+  updateUserInfo();
 }
 
 function updateUserInfo() {
   const userInfo = document.getElementById('userInfo');
+  const name = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
   userInfo.innerHTML = `
-    <span>Welcome, ${currentUser.email.split('@')[0]}</span>
+    <span>Welcome, ${name}</span>
     <button onclick="signOut()" class="btn btn-small btn-secondary">Sign Out</button>
   `;
 }
 
 async function signOut() {
   await supabase.auth.signOut();
-  window.location.reload();
+  window.location.href = 'auth.html';
 }
 
-// Data Functions
+// Load user data from Supabase
 async function loadUserData() {
-  if (!currentUser) {
-    // Load from localStorage if not authenticated
-    const saved = localStorage.getItem('pulseData');
-    if (saved) {
-      userData = JSON.parse(saved);
-    }
-    return;
-  }
-  
-  // Load from Supabase
-  const { data, error } = await supabase
-    .from('user_data')
-    .select('*')
+  const { data, error } = await supabase    .from('user_data')
+    .select('data')
     .eq('user_id', currentUser.id)
     .single();
   
@@ -90,43 +57,84 @@ async function loadUserData() {
   }
 }
 
+// Save user data to Supabase
 async function saveUserData() {
-  if (!currentUser) {
-    // Save to localStorage
-    localStorage.setItem('pulseData', JSON.stringify(userData));
-    return;
-  }
-    // Save to Supabase
   const { error } = await supabase
     .from('user_data')
     .upsert({
       user_id: currentUser.id,
-       userData,
+      data: userData,
       updated_at: new Date().toISOString()
+    }, {
+      onConflict: 'user_id'
     });
   
   if (error) console.error('Error saving:', error);
 }
 
-// Navigation
-function showSection(sectionName) {
-  // Hide all sections
-  document.querySelectorAll('.dashboard-section').forEach(section => {
-    section.classList.remove('active');
-  });
+// Calculate streak
+function calculateStreak() {
+  if (!userData.last_active) return;
   
-  // Show selected section
-  document.getElementById(sectionName).classList.add('active');
+  const lastActive = new Date(userData.last_active);
+  const today = new Date();
+  const diffDays = Math.floor((today - lastActive) / (1000 * 60 * 60 * 24));
   
-  // Update nav buttons
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  event.target.classList.add('active');
+  if (diffDays === 1) {
+    // Consecutive day
+    userData.streak += 1;
+  } else if (diffDays > 1) {
+    // Streak broken
+    userData.streak = 0;
+  }
+  // If diffDays === 0, already active today
 }
 
-// Habits
-function addHabit() {
+// Daily check-in
+async function updateDailyCheckIn() {
+  const today = new Date().toDateString();
+  const lastActive = userData.last_active ? new Date(userData.last_active).toDateString() : null;
+  
+  if (today !== lastActive) {
+    // New day - check if streak continues    if (lastActive) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      if (new Date(lastActive).toDateString() === yesterday.toDateString()) {
+        userData.streak += 1;
+        addActivity(`🔥 Streak extended! ${userData.streak} days`);
+      } else if (lastActive !== today) {
+        userData.streak = 1; // Reset to 1 for new activity
+        addActivity(`🔥 New streak started!`);
+      }
+    } else {
+      userData.streak = 1;
+      addActivity(`🔥 First day! Let's go!`);
+    }
+    
+    userData.last_active = new Date().toISOString();
+    await saveUserData();
+    updateStats();
+  }
+}
+
+// Add activity log
+function addActivity(text) {
+  const activity = {
+    text: text,
+    timestamp: new Date().toISOString()
+  };
+  
+  if (!userData.activity) userData.activity = [];
+  userData.activity.unshift(activity);
+  if (userData.activity.length > 50) userData.activity.pop();
+  
+  saveUserData();
+  renderActivity();
+}
+
+// Habits with streak tracking
+async function addHabit() {
   const name = prompt('Enter habit name:');
   if (!name) return;
   
@@ -135,39 +143,50 @@ function addHabit() {
     name: name,
     completed: false,
     streak: 0,
+    completedDates: [],
     createdAt: new Date().toISOString()
-  });
-  
+  });  
+  addActivity(`Added habit: ${name}`);
   saveUserData();
   renderHabits();
   updateStats();
 }
 
-function toggleHabit(id) {
+async function toggleHabit(id) {
   const habit = userData.habits.find(h => h.id === id);
-  if (habit) {    habit.completed = !habit.completed;
-    if (habit.completed) {
-      habit.streak += 1;
-      addActivity(`Completed habit: ${habit.name}`);
-    }
-    saveUserData();
-    renderHabits();
-    updateStats();
+  if (!habit) return;
+  
+  const today = new Date().toDateString();
+  const wasCompleted = habit.completedDates.includes(today);
+  
+  if (!wasCompleted) {
+    habit.completedDates.push(today);
+    habit.streak += 1;
+    addActivity(`✅ Completed: ${habit.name} (${habit.streak} day streak)`);
+  } else {
+    habit.completedDates = habit.completedDates.filter(d => d !== today);
+    habit.streak = Math.max(0, habit.streak - 1);
+    addActivity(`❌ Undone: ${habit.name}`);
   }
+  
+  habit.completed = habit.completedDates.length > 0;
+  await saveUserData();
+  renderHabits();
+  updateStats();
 }
 
-function deleteHabit(id) {
-  if (confirm('Delete this habit?')) {
-    userData.habits = userData.habits.filter(h => h.id !== id);
-    saveUserData();
-    renderHabits();
-    updateStats();
-  }
+async function deleteHabit(id) {
+  if (!confirm('Delete this habit?')) return;
+  
+  userData.habits = userData.habits.filter(h => h.id !== id);
+  await saveUserData();
+  renderHabits();
+  updateStats();
 }
 
 function renderHabits() {
   const container = document.getElementById('habitsList');
-  if (userData.habits.length === 0) {
+  if (!userData.habits || userData.habits.length === 0) {
     container.innerHTML = '<p class="empty-state">No habits yet. Add your first habit!</p>';
     return;
   }
@@ -175,8 +194,7 @@ function renderHabits() {
   container.innerHTML = userData.habits.map(habit => `
     <div class="habit-card">
       <div class="habit-info">
-        <h3>${habit.name}</h3>
-        <p>🔥 ${habit.streak} day streak</p>
+        <h3>${habit.name}</h3>        <p>🔥 ${habit.streak} day streak</p>
       </div>
       <div class="habit-actions">
         <input 
@@ -191,10 +209,11 @@ function renderHabits() {
   `).join('');
 }
 
-// Sleep
+// Sleep tracking
 async function logSleep() {
   const hours = parseFloat(document.getElementById('sleepHours').value);
-  if (!hours || hours < 0 || hours > 24) {    alert('Please enter valid hours (0-24)');
+  if (!hours || hours < 0 || hours > 24) {
+    alert('Please enter valid hours (0-24)');
     return;
   }
   
@@ -203,34 +222,30 @@ async function logSleep() {
     date: new Date().toISOString()
   });
   
-  addActivity(`Logged ${hours}h of sleep`);
+  addActivity(`😴 Logged ${hours}h of sleep`);
   document.getElementById('sleepHours').value = '';
-  saveUserData();
+  await saveUserData();
   renderSleep();
   updateStats();
 }
 
 function renderSleep() {
   const sleepList = document.getElementById('sleepHistoryList');
-  const avgSleep = document.getElementById('avgSleep');
-  const sleepEntries = document.getElementById('sleepEntries');
-  const bestSleep = document.getElementById('bestSleep');
   
-  if (userData.sleep.length === 0) {
+  if (!userData.sleep || userData.sleep.length === 0) {
     sleepList.innerHTML = '<p class="empty-state">No sleep logs yet</p>';
-    avgSleep.textContent = '--h';
-    sleepEntries.textContent = '0';
-    bestSleep.textContent = '--h';
+    document.getElementById('avgSleep').textContent = '--h';
+    document.getElementById('sleepEntries').textContent = '0';
+    document.getElementById('bestSleep').textContent = '--h';
     return;
   }
   
   const total = userData.sleep.reduce((sum, s) => sum + s.hours, 0);
   const avg = (total / userData.sleep.length).toFixed(1);
   const best = Math.max(...userData.sleep.map(s => s.hours));
-  
-  avgSleep.textContent = `${avg}h`;
-  sleepEntries.textContent = userData.sleep.length;
-  bestSleep.textContent = `${best}h`;
+    document.getElementById('avgSleep').textContent = `${avg}h`;
+  document.getElementById('sleepEntries').textContent = userData.sleep.length;
+  document.getElementById('bestSleep').textContent = `${best}h`;
   
   sleepList.innerHTML = userData.sleep
     .slice(-10)
@@ -243,7 +258,8 @@ function renderSleep() {
     `).join('');
 }
 
-// Learningasync function logLearning() {
+// Learning tracking
+async function logLearning() {
   const topic = document.getElementById('learnTopic').value.trim();
   const minutes = parseInt(document.getElementById('learnMinutes').value);
   const category = document.getElementById('learnCategory').value;
@@ -260,41 +276,37 @@ function renderSleep() {
     date: new Date().toISOString()
   });
   
-  addActivity(`Learned ${topic} for ${minutes}m`);
+  addActivity(`📚 Learned ${topic} for ${minutes}m`);
   document.getElementById('learnTopic').value = '';
   document.getElementById('learnMinutes').value = '';
-  saveUserData();
+  await saveUserData();
   renderLearning();
   updateStats();
 }
 
 function renderLearning() {
   const learnList = document.getElementById('learningHistoryList');
-  const totalHours = document.getElementById('totalLearningHours');
-  const learnEntries = document.getElementById('learningEntries');
-  const weekLearning = document.getElementById('weekLearning');
   
-  if (userData.learning.length === 0) {
+  if (!userData.learning || userData.learning.length === 0) {
     learnList.innerHTML = '<p class="empty-state">No learning logs yet</p>';
-    totalHours.textContent = '0h';
-    learnEntries.textContent = '0';
-    weekLearning.textContent = '0h';
-    return;
-  }
+    document.getElementById('totalLearningHours').textContent = '0h';
+    document.getElementById('learningEntries').textContent = '0';
+    document.getElementById('weekLearning').textContent = '0h';
+    return;  }
   
   const totalMins = userData.learning.reduce((sum, l) => sum + l.minutes, 0);
   const totalH = (totalMins / 60).toFixed(1);
   
-  // Calculate this week
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
   const weekMins = userData.learning
     .filter(l => new Date(l.date) > weekAgo)
     .reduce((sum, l) => sum + l.minutes, 0);
   const weekH = (weekMins / 60).toFixed(1);
-    totalHours.textContent = `${totalH}h`;
-  learnEntries.textContent = userData.learning.length;
-  weekLearning.textContent = `${weekH}h`;
+  
+  document.getElementById('totalLearningHours').textContent = `${totalH}h`;
+  document.getElementById('learningEntries').textContent = userData.learning.length;
+  document.getElementById('weekLearning').textContent = `${weekH}h`;
   
   learnList.innerHTML = userData.learning
     .slice(-10)
@@ -314,7 +326,7 @@ function renderLearning() {
 }
 
 // Goals
-function addGoal() {
+async function addGoal() {
   const name = document.getElementById('goalName').value.trim();
   const target = parseInt(document.getElementById('goalTarget').value);
   const current = parseInt(document.getElementById('goalCurrent').value) || 0;
@@ -329,39 +341,43 @@ function addGoal() {
     name: name,
     target: target,
     current: current,
-    createdAt: new Date().toISOString()
-  });
+    createdAt: new Date().toISOString()  });
   
-  addActivity(`Added goal: ${name}`);
+  addActivity(`🎯 Added goal: ${name}`);
   document.getElementById('goalName').value = '';
   document.getElementById('goalTarget').value = '';
   document.getElementById('goalCurrent').value = '0';
-  saveUserData();
+  await saveUserData();
   renderGoals();
   updateStats();
 }
 
-function updateGoal(id, newCurrent) {  const goal = userData.goals.find(g => g.id === id);
+async function updateGoal(id, newCurrent) {
+  const goal = userData.goals.find(g => g.id === id);
   if (goal) {
     goal.current = parseInt(newCurrent);
-    saveUserData();
+    if (goal.current >= goal.target) {
+      addActivity(`🎉 Goal completed: ${goal.name}!`);
+    }
+    await saveUserData();
     renderGoals();
     updateStats();
   }
 }
 
-function deleteGoal(id) {
-  if (confirm('Delete this goal?')) {
-    userData.goals = userData.goals.filter(g => g.id !== id);
-    saveUserData();
-    renderGoals();
-    updateStats();
-  }
+async function deleteGoal(id) {
+  if (!confirm('Delete this goal?')) return;
+  
+  userData.goals = userData.goals.filter(g => g.id !== id);
+  await saveUserData();
+  renderGoals();
+  updateStats();
 }
 
 function renderGoals() {
   const container = document.getElementById('goalsList');
-  if (userData.goals.length === 0) {
+  
+  if (!userData.goals || userData.goals.length === 0) {
     container.innerHTML = '<p class="empty-state">No goals yet. Add your first goal!</p>';
     return;
   }
@@ -374,8 +390,7 @@ function renderGoals() {
           <h3>${goal.name}</h3>
           <button class="btn-delete" onclick="deleteGoal(${goal.id})">Delete</button>
         </div>
-        <div class="goal-progress-bar">
-          <div class="goal-progress-fill" style="width: ${percentage}%"></div>
+        <div class="goal-progress-bar">          <div class="goal-progress-fill" style="width: ${percentage}%"></div>
         </div>
         <div class="goal-stats">
           <div>
@@ -390,26 +405,13 @@ function renderGoals() {
             <span> / ${goal.target}</span>
           </div>
           <div class="goal-percentage">${percentage}%</div>
-        </div>      </div>
+        </div>
+      </div>
     `;
   }).join('');
 }
 
-// Activity
-function addActivity(text) {
-  const activity = {
-    text: text,
-    timestamp: new Date().toISOString()
-  };
-  
-  if (!userData.activity) userData.activity = [];
-  userData.activity.unshift(activity);
-  if (userData.activity.length > 20) userData.activity.pop();
-  
-  saveUserData();
-  renderActivity();
-}
-
+// Activity feed
 function renderActivity() {
   const container = document.getElementById('recentActivityList');
   const activity = userData.activity || [];
@@ -419,7 +421,7 @@ function renderActivity() {
     return;
   }
   
-  container.innerHTML = activity.map(item => `
+  container.innerHTML = activity.slice(0, 20).map(item => `
     <div class="activity-item">
       <span>${item.text}</span>
       <span class="activity-date">${new Date(item.timestamp).toLocaleString()}</span>
@@ -427,27 +429,32 @@ function renderActivity() {
   `).join('');
 }
 
-// Stats
+// Update all stats
 function updateStats() {
+  // Streak
+  document.getElementById('streakCount').textContent = `${userData.streak || 0} days`;
+  
   // Habits
-  const completed = userData.habits.filter(h => h.completed).length;
-  const total = userData.habits.length;
+  const completed = userData.habits ? userData.habits.filter(h => h.completed).length : 0;
+  const total = userData.habits ? userData.habits.length : 0;
   document.getElementById('habitsDone').textContent = `${completed}/${total}`;
   
-  // Sleep
-  if (userData.sleep.length > 0) {
+  // Sleep  if (userData.sleep && userData.sleep.length > 0) {
     const last = userData.sleep[userData.sleep.length - 1];
     document.getElementById('lastSleep').textContent = `${last.hours}h`;
   }
-    // Learning
+  
+  // Learning
   const today = new Date().toDateString();
   const todayLearning = userData.learning
-    .filter(l => new Date(l.date).toDateString() === today)
-    .reduce((sum, l) => sum + l.minutes, 0);
+    ? userData.learning
+        .filter(l => new Date(l.date).toDateString() === today)
+        .reduce((sum, l) => sum + l.minutes, 0)
+    : 0;
   document.getElementById('learningToday').textContent = `${todayLearning}m`;
   
   // Goals
-  if (userData.goals.length > 0) {
+  if (userData.goals && userData.goals.length > 0) {
     const totalProgress = userData.goals.reduce((sum, g) => {
       return sum + (g.current / g.target) * 100;
     }, 0);
@@ -455,16 +462,12 @@ function updateStats() {
     document.getElementById('goalProgress').textContent = `${avgProgress}%`;
   }
   
-  // Streak
-  const maxStreak = userData.habits.reduce((max, h) => Math.max(max, h.streak), 0);
-  document.getElementById('streakCount').textContent = `${maxStreak} days`;
-  
   // Today's progress
   const todayProgress = total > 0 ? Math.round((completed / total) * 100) : 0;
   document.getElementById('todayProgress').textContent = `${todayProgress}%`;
 }
 
-// Render all
+// Render all sections
 function renderAll() {
   renderHabits();
   renderSleep();
@@ -472,4 +475,17 @@ function renderAll() {
   renderGoals();
   renderActivity();
   updateStats();
-    }
+}
+
+// Navigation
+function showSection(sectionName) {
+  document.querySelectorAll('.dashboard-section').forEach(section => {
+    section.classList.remove('active');
+  });
+  
+  document.getElementById(sectionName).classList.add('active');
+  
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');}
