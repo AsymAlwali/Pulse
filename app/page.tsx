@@ -1,7 +1,6 @@
 import Link from "next/link"
-import Image from "next/image"
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
-import { ArrowRight, Check, Zap, Moon, BookOpen, Target, BarChart3, Users, Smartphone, RefreshCw, DollarSign, Link2, Globe, Rocket } from "lucide-react"
+import { Check, Zap, Moon, BookOpen, Target, BarChart3, Users, Smartphone, RefreshCw, DollarSign, Link2, Globe, Rocket } from "lucide-react"
 
 export default function LandingPage() {
   return (
@@ -10,14 +9,11 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-3">
-            <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-primary">
-              <Image
-                src="/profile.jpg"
-                alt="Asym Alwali"
-                fill
-                className="object-cover"
-              />
-            </div>
+            <img
+              src="/profile.jpg"
+              alt="Asym Alwali"
+              className="h-10 w-10 rounded-full border-2 border-primary object-cover"
+            />
             <span className="text-xl font-bold">Pulse</span>
           </Link>
 
@@ -61,14 +57,11 @@ export default function LandingPage() {
           {/* Tweet Card */}
           <div className="mx-auto mb-12 max-w-xl rounded-2xl bg-white p-6 text-foreground shadow-2xl">
             <div className="flex items-center gap-4 mb-4">
-              <div className="relative h-12 w-12 overflow-hidden rounded-full">
-                <Image
-                  src="/profile.jpg"
-                  alt="Asym Alwali"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+              <img
+                src="/profile.jpg"
+                alt="Asym Alwali"
+                className="h-12 w-12 rounded-full object-cover"
+              />
               <div>
                 <div className="flex items-center gap-1 font-bold text-slate-900">
                   Asym Alwali
@@ -230,14 +223,11 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
             <div className="flex items-center gap-4">
-              <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-blue-500">
-                <Image
-                  src="/profile.jpg"
-                  alt="Asym Alwali"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+              <img
+                src="/profile.jpg"
+                alt="Asym Alwali"
+                className="h-12 w-12 rounded-full border-2 border-blue-500 object-cover"
+              />
               <div>
                 <p className="font-bold">Built by Asym Alwali</p>
                 <p className="text-sm text-slate-400">

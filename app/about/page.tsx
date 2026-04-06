@@ -1,5 +1,4 @@
 import Link from "next/link"
-import Image from "next/image"
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 import { Github, ExternalLink, Zap } from "lucide-react"
 
@@ -10,14 +9,11 @@ export default function AboutPage() {
       <nav className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur-sm shadow-sm">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-3">
-            <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-blue-500">
-              <Image
-                src="/profile.jpg"
-                alt="Asym Alwali"
-                fill
-                className="object-cover"
-              />
-            </div>
+            <img
+              src="/profile.jpg"
+              alt="Asym Alwali"
+              className="h-10 w-10 rounded-full border-2 border-blue-500 object-cover"
+            />
             <span className="text-xl font-bold text-slate-900">Pulse</span>
           </Link>
 
@@ -59,14 +55,11 @@ export default function AboutPage() {
       <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         {/* Profile Header */}
         <div className="text-center">
-          <div className="relative mx-auto h-36 w-36 overflow-hidden rounded-full border-4 border-slate-900">
-            <Image
-              src="/profile.jpg"
-              alt="Asym Alwali"
-              fill
-              className="object-cover"
-            />
-          </div>
+          <img
+            src="/profile.jpg"
+            alt="Asym Alwali"
+            className="mx-auto h-36 w-36 rounded-full border-4 border-slate-900 object-cover"
+          />
           <h1 className="mt-6 text-3xl font-bold text-slate-900">Asym Alwali</h1>
           <p className="mt-2 text-lg text-slate-500">@Asym_Alwali</p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
