@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulse Dashboard - Track Everything</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <img src="profile.jpg" alt="Asym Alwali" class="profile-pic-small">
+      <span>Pulse</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Why</a>
+      <a href="dashboard.html" class="active">Dashboard</a>
+      <a href="about.html">About</a>
+    </div>
+    <div class="user-info" id="userInfo">
+      <button onclick="showAuthModal()" class="btn btn-small">Sign In</button>
+    </div>
+  </nav>
+
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3>Quick Stats</h3>
+        <div class="stat-item">
+          <span class="stat-label">Streak</span>
+          <span class="stat-value" id="streakCount">0 days</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Today's Progress</span>
+          <span class="stat-value" id="todayProgress">0%</span>
+        </div>
+      </div>
+      
+      <div class="sidebar-section">
+        <h3>Navigation</h3>
+        <button class="nav-btn active" onclick="showSection('overview')">Overview</button>
+        <button class="nav-btn" onclick="showSection('habits')">Habits</button>
+        <button class="nav-btn" onclick="showSection('sleep')">Sleep</button>
+        <button class="nav-btn" onclick="showSection('learning')">Learning</button>
+        <button class="nav-btn" onclick="showSection('goals')">Goals</button>
+      </div>
+    </aside>
+
+    <main class="main-content">      <!-- Overview Section -->
+      <section id="overview" class="dashboard-section active">
+        <h2>Today's Overview</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-details">
+              <h3>Habits Done</h3>
+              <p class="stat-number" id="habitsDone">0/0</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">😴</div>
+            <div class="stat-details">
+              <h3>Last Sleep</h3>
+              <p class="stat-number" id="lastSleep">--h</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-details">
+              <h3>Learning Today</h3>
+              <p class="stat-number" id="learningToday">0m</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-details">
+              <h3>Goal Progress</h3>
+              <p class="stat-number" id="goalProgress">0%</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="recent-activity">
+          <h3>Recent Activity</h3>
+          <div id="recentActivityList" class="activity-list">
+            <p class="empty-state">No activity yet. Start tracking!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Habits Section -->
+      <section id="habits" class="dashboard-section">
+        <div class="section-header">
+          <h2>Daily Habits</h2>
+          <button onclick="addHabit()" class="btn btn-primary">+ Add Habit</button>
+        </div>
+        <div id="habitsList" class="habits-grid">
+          <!-- Habits loaded dynamically -->        </div>
+      </section>
+
+      <!-- Sleep Section -->
+      <section id="sleep" class="dashboard-section">
+        <h2>Sleep Tracker</h2>
+        <div class="sleep-input-card">
+          <div class="input-group">
+            <label>Hours Slept Last Night</label>
+            <div class="input-with-button">
+              <input type="number" id="sleepHours" min="0" max="24" step="0.5" placeholder="7.5">
+              <button onclick="logSleep()" class="btn btn-primary">Log Sleep</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="sleep-stats">
+          <div class="sleep-stat">
+            <h4>Average Sleep</h4>
+            <p class="stat-big" id="avgSleep">--h</p>
+          </div>
+          <div class="sleep-stat">
+            <h4>Total Entries</h4>
+            <p class="stat-big" id="sleepEntries">0</p>
+          </div>
+          <div class="sleep-stat">
+            <h4>Best Night</h4>
+            <p class="stat-big" id="bestSleep">--h</p>
+          </div>
+        </div>
+
+        <div class="sleep-history">
+          <h3>Recent Logs</h3>
+          <div id="sleepHistoryList" class="history-list">
+            <!-- Sleep logs loaded dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Learning Section -->
+      <section id="learning" class="dashboard-section">
+        <h2>Learning Log</h2>
+        <div class="learning-input-card">
+          <input type="text" id="learnTopic" placeholder="What did you learn? (e.g., JavaScript Promises)">
+          <div class="input-row">
+            <input type="number" id="learnMinutes" placeholder="Minutes spent" min="1">
+            <select id="learnCategory">
+              <option value="coding">Coding</option>
+              <option value="design">Design</option>
+              <option value="business">Business</option>              <option value="other">Other</option>
+            </select>
+            <button onclick="logLearning()" class="btn btn-primary">Log Learning</button>
+          </div>
+        </div>
+
+        <div class="learning-stats">
+          <div class="learning-stat">
+            <h4>Total Hours</h4>
+            <p class="stat-big" id="totalLearningHours">0h</p>
+          </div>
+          <div class="learning-stat">
+            <h4>Entries</h4>
+            <p class="stat-big" id="learningEntries">0</p>
+          </div>
+          <div class="learning-stat">
+            <h4>This Week</h4>
+            <p class="stat-big" id="weekLearning">0h</p>
+          </div>
+        </div>
+
+        <div class="learning-history">
+          <h3>Recent Learning</h3>
+          <div id="learningHistoryList" class="history-list">
+            <!-- Learning logs loaded dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Goals Section -->
+      <section id="goals" class="dashboard-section">
+        <h2>Active Goals</h2>
+        <div class="goal-input-card">
+          <input type="text" id="goalName" placeholder="Goal name (e.g., Learn React)">
+          <div class="input-row">
+            <input type="number" id="goalTarget" placeholder="Target (e.g., 100)" min="1">
+            <input type="number" id="goalCurrent" placeholder="Current progress" min="0" value="0">
+            <button onclick="addGoal()" class="btn btn-primary">Add Goal</button>
+          </div>
+        </div>
+
+        <div id="goalsList" class="goals-grid">
+          <!-- Goals loaded dynamically -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="modal">    <div class="modal-content">
+      <span class="close-modal" onclick="closeAuthModal()">&times;</span>
+      <h2>Sign In to Sync</h2>
+      <p>Save your data to the cloud and access it from anywhere.</p>
+      <div class="auth-buttons">
+        <button onclick="signInWithGoogle()" class="btn btn-google">
+          <img src="https://www.google.com/favicon.ico" alt="Google"> Sign in with Google
+        </button>
+        <button onclick="signInWithEmail()" class="btn btn-email">
+          Sign in with Email
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+              </html>
