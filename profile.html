@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Your Profile - Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <img src="profile.jpg" alt="Pulse" class="profile-pic-small">
+      <span>Pulse</span>
+    </div>
+  </nav>
+
+  <div class="profile-setup-container">
+    <div class="profile-card">
+      <h1>👋 Welcome to Pulse!</h1>
+      <p>Let's set up your profile to get started</p>
+
+      <form id="profileForm" class="profile-form">
+        <div class="form-section">
+          <h3>Basic Info</h3>
+          <div class="form-group">
+            <label>Display Name</label>
+            <input type="text" id="displayName" required placeholder="How should we call you?">
+          </div>
+          
+          <div class="form-group">
+            <label>Timezone</label>
+            <select id="timezone" required>
+              <option value="">Select your timezone</option>
+              <option value="Africa/Lagos">West Africa (Lagos)</option>
+              <option value="Africa/Cairo">Cairo</option>
+              <option value="Europe/London">London</option>
+              <option value="America/New_York">New York</option>
+              <option value="Asia/Dubai">Dubai</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Your Goals</h3>
+          <div class="form-group">
+            <label>What do you want to track? (Select all that apply)</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="goals" value="habits">
+                <span>📋 Daily Habits</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="goals" value="sleep">
+                <span>😴 Sleep Quality</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="goals" value="learning">
+                <span>📚 Learning Time</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="goals" value="fitness">
+                <span>💪 Fitness/Exercise</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="goals" value="productivity">
+                <span>⚡ Productivity</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>First Goal</h3>
+          <div class="form-group">
+            <label>What's your #1 goal right now?</label>
+            <input type="text" id="mainGoal" placeholder="e.g., Build a consistent morning routine">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-large">
+          Complete Setup & Go to Dashboard →
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>
