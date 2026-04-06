@@ -1,76 +1,61 @@
-let currentUser = null;
-
 window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  
-  if (!session) {
+  if (!window.Clerk.user) {
     window.location.href = 'auth.html';
     return;
   }
-  
-  currentUser = session.user;
-  
+
+  // Mount user button in navbar
+  const userBtn = document.getElementById('clerk-user-btn');
+  await window.Clerk.mountUserButton(userBtn);
+
+  // Pre-fill name
+  const name = window.Clerk.user.fullName || window.Clerk.user.firstName || 'User';
+  document.getElementById('userName').textContent = name;
+
   // Check if profile already exists
-  const { data: profile } = await supabase
+  const { data } = await window.supabase
     .from('profiles')
-    .select('*')
-    .eq('id', currentUser.id)
+    .select('is_setup_complete')
+    .eq('user_id', window.Clerk.user.id)
     .single();
-  
-  if (profile && profile.is_setup_complete) {
+
+  if (data?.is_setup_complete) {
     window.location.href = 'dashboard.html';
-  }
-  
-  // Pre-fill name if available
-  if (profile?.full_name) {
-    document.getElementById('displayName').value = profile.full_name;
   }
 });
 
 document.getElementById('profileForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  const displayName = document.getElementById('displayName').value;
   const timezone = document.getElementById('timezone').value;
   const mainGoal = document.getElementById('mainGoal').value;
-  
-  // Get selected goals
-  const selectedGoals = Array.from(document.querySelectorAll('input[name="goals"]:checked'))
-    .map(cb => cb.value);
-  
-  // Update profile
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      display_name: displayName,
-      timezone: timezone,
-      goals: selectedGoals,
-      main_goal: mainGoal,
-      is_setup_complete: true,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', currentUser.id);
-  
-  if (error) {
-    alert('Error saving profile: ' + error.message);
-    return;
-  }
-  
+  const selectedGoals = Array.from(document.querySelectorAll('input[name="goals"]:checked')).map(cb => cb.value);
+  const userId = window.Clerk.user.id;
+
+  // Save profile
+  await window.supabase.from('profiles').upsert({
+    user_id: userId,
+    timezone,
+    goals: selectedGoals,
+    main_goal: mainGoal,
+    is_setup_complete: true,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'user_id' });
+
   // Create initial user data
-  await supabase
-    .from('user_data')
-    .insert({
-      user_id: currentUser.id,
-      data: {
-        habits: [],
-        sleep: [],
-        learning: [],
-        goals: mainGoal ? [{ name: mainGoal, current: 0, target: 100 }] : [],
-        streak: 0,
-        last_active: new Date().toISOString()
-      }
-    });
-  
-  // Redirect to dashboard
+  await window.supabase.from('user_data').upsert({
+    user_id: userId,
+     {
+      habits: [],
+      sleep: [],
+      learning: [],
+      goals: mainGoal ? [{ name: mainGoal, current: 0, target: 100, id: Date.now() }] : [],
+      streak: 0,
+      last_active: new Date().toISOString(),
+      activity: [{ text: ' Account created!', timestamp: new Date().toISOString() }]
+    },
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'user_id' });
+
   window.location.href = 'dashboard.html';
 });
