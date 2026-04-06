@@ -1,25 +1,34 @@
 import Link from "next/link"
+import Image from "next/image"
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
-import { ArrowRight, Check, Zap, Moon, BookOpen, Target, BarChart3, Users } from "lucide-react"
+import { ArrowRight, Check, Zap, Moon, BookOpen, Target, BarChart3, Users, Smartphone, RefreshCw, DollarSign, Link2, Globe, Rocket } from "lucide-react"
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-sm">
+      <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground">
-              <Zap className="h-5 w-5 text-background" />
+          <Link href="/" className="flex items-center gap-3">
+            <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-primary">
+              <Image
+                src="/profile.jpg"
+                alt="Asym Alwali"
+                fill
+                className="object-cover"
+              />
             </div>
             <span className="text-xl font-bold">Pulse</span>
           </Link>
 
           <div className="hidden items-center gap-8 md:flex">
-            <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Why Pulse
+            <Link href="/" className="text-sm font-semibold text-foreground transition-colors hover:text-primary">
+              Why
             </Link>
-            <Link href="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/dashboard" className="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground">
+              Dashboard
+            </Link>
+            <Link href="/about" className="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground">
               About
             </Link>
           </div>
@@ -30,13 +39,7 @@ export default function LandingPage() {
                 href="/sign-in"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                Log in
-              </Link>
-              <Link
-                href="/sign-up"
-                className="inline-flex h-9 items-center justify-center rounded-lg bg-foreground px-4 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
-              >
-                Sign up
+                Sign In
               </Link>
             </SignedOut>
             <SignedIn>
@@ -53,56 +56,141 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 sm:py-32">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-4 py-1.5 text-sm font-medium">
-              <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
-              Free forever. Built in public.
+      <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 py-16 sm:py-24 text-white">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+          {/* Tweet Card */}
+          <div className="mx-auto mb-12 max-w-xl rounded-2xl bg-white p-6 text-foreground shadow-2xl">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="relative h-12 w-12 overflow-hidden rounded-full">
+                <Image
+                  src="/profile.jpg"
+                  alt="Asym Alwali"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div>
+                <div className="flex items-center gap-1 font-bold text-slate-900">
+                  Asym Alwali
+                  <span className="text-blue-500">&#10003;</span>
+                </div>
+                <div className="text-sm text-slate-500">@Asym_Alwali</div>
+              </div>
             </div>
-            
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl text-balance">
-              Stop juggling apps.{" "}
-              <span className="text-muted-foreground">Start tracking life.</span>
+            <p className="text-slate-800 text-lg mb-3">
+              Building Pulse because I was frustrated with scattered tracking tools. One dashboard to rule them all. 🚀
+            </p>
+            <a
+              href="https://x.com/i/status/2041181255094472805"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 font-semibold hover:underline"
+            >
+              View on X →
+            </a>
+          </div>
+
+          <div className="text-center">
+            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-balance">
+              Stop Juggling Apps.
+              <br />
+              <span className="text-blue-400">Start Tracking Life.</span>
             </h1>
             
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground text-balance">
-              I built Pulse because I was tired of using 5 different apps to track my habits, sleep, 
-              learning, and goals. Now it&apos;s all in one place.
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 text-balance">
+              I built Pulse because I was tired of using 5 different apps to track my habits, sleep, learning, and goals. Now it&apos;s all in one place.
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                href="/sign-up"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-foreground px-6 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
+                href="/dashboard"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-slate-900 px-8 text-sm font-semibold text-white transition-all hover:bg-slate-800 hover:-translate-y-0.5 shadow-lg hover:shadow-xl"
               >
-                Get started free
-                <ArrowRight className="h-4 w-4" />
+                Launch Dashboard
               </Link>
               <Link
                 href="/about"
-                className="inline-flex h-12 items-center justify-center rounded-lg border border-border bg-background px-6 text-sm font-medium transition-colors hover:bg-secondary"
+                className="inline-flex h-12 items-center justify-center rounded-lg border-2 border-white bg-transparent px-8 text-sm font-semibold text-white transition-colors hover:bg-white/10"
               >
-                Meet the builder
+                Meet the Builder
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="border-t border-border bg-secondary/30 py-20 sm:py-28">
+      {/* Problem Section */}
+      <section className="bg-white py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-center text-3xl font-bold sm:text-4xl mb-12">
+            😤 The Problem
+          </h2>
+          
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <ProblemCard
+              icon={<Smartphone className="h-8 w-8" />}
+              title="Too Many Apps"
+              description="Habit tracker here, sleep app there, learning log somewhere else. It's chaos."
+            />
+            <ProblemCard
+              icon={<RefreshCw className="h-8 w-8" />}
+              title="No Context"
+              description="Your sleep affects your habits. Your learning affects your goals. But your apps don't talk to each other."
+            />
+            <ProblemCard
+              icon={<DollarSign className="h-8 w-8" />}
+              title="Premium Walls"
+              description="Why pay $10/month for each tracking tool? Building in public should be free."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Solution Section */}
+      <section className="bg-slate-50 py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 className="text-center text-3xl font-bold sm:text-4xl mb-12">
+            ✨ The Solution
+          </h2>
+          
+          <div className="grid gap-6 sm:grid-cols-2">
+            <SolutionCard
+              icon={<BarChart3 className="h-6 w-6" />}
+              title="One Dashboard"
+              description="Habits, sleep, learning, goals — all visible at a glance."
+            />
+            <SolutionCard
+              icon={<Link2 className="h-6 w-6" />}
+              title="Connected Data"
+              description="See how your sleep impacts your habit completion. Track correlations that matter."
+            />
+            <SolutionCard
+              icon={<Globe className="h-6 w-6" />}
+              title="Share & Collaborate"
+              description="Built with Supabase. Share your progress, compete with friends, stay accountable."
+            />
+            <SolutionCard
+              icon={<Rocket className="h-6 w-6" />}
+              title="Free Forever"
+              description="Open source. No premium tiers. No BS. Just tracking that works."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="border-t border-border bg-white py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-2xl text-center mb-16">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Everything you need, nothing you don&apos;t
+              Everything you need
             </h2>
             <p className="mt-4 text-muted-foreground">
               One dashboard to rule them all. Track what matters, skip the noise.
             </p>
           </div>
 
-          <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <FeatureCard
               icon={<Check className="h-5 w-5" />}
               title="Habit Tracking"
@@ -137,60 +225,27 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Problem/Solution Section */}
-      <section className="py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-            <div>
-              <h2 className="text-2xl font-bold sm:text-3xl">The problem</h2>
-              <ul className="mt-8 space-y-6">
-                <ProblemItem
-                  title="Too many apps"
-                  description="Habit tracker here, sleep app there, learning log somewhere else. It's chaos."
-                />
-                <ProblemItem
-                  title="No context"
-                  description="Your sleep affects your habits. Your learning affects your goals. But your apps don't talk to each other."
-                />
-                <ProblemItem
-                  title="Premium walls"
-                  description="Why pay $10/month for each tracking tool? Building in public should be free."
-                />
-              </ul>
-            </div>
-
-            <div className="rounded-2xl border border-border bg-card p-8">
-              <h2 className="text-2xl font-bold sm:text-3xl">The solution</h2>
-              <ul className="mt-8 space-y-4">
-                <SolutionItem text="One unified dashboard for everything" />
-                <SolutionItem text="See how metrics connect and affect each other" />
-                <SolutionItem text="Streak tracking that actually motivates" />
-                <SolutionItem text="Activity feed to review your progress" />
-                <SolutionItem text="Free and open source. Forever." />
-              </ul>
-              <Link
-                href="/sign-up"
-                className="mt-8 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-foreground px-5 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
-              >
-                Start tracking now
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
-      <footer className="border-t border-border bg-secondary/30 py-12">
+      <footer className="bg-slate-900 text-white py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
             <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground">
-                <span className="text-sm font-bold text-background">A</span>
+              <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-blue-500">
+                <Image
+                  src="/profile.jpg"
+                  alt="Asym Alwali"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div>
-                <p className="font-semibold">Built by Asym Alwali</p>
-                <p className="text-sm text-muted-foreground">19 - Nigeria - CS Student</p>
+                <p className="font-bold">Built by Asym Alwali</p>
+                <p className="text-sm text-slate-400">
+                  19 • Nigeria • CS Student • Building{" "}
+                  <a href="https://fracq.carrd.co" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                    FracqAI
+                  </a>
+                </p>
               </div>
             </div>
 
@@ -199,7 +254,7 @@ export default function LandingPage() {
                 href="https://x.com/Asym_Alwali"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
                 X/Twitter
               </a>
@@ -207,23 +262,65 @@ export default function LandingPage() {
                 href="https://github.com/Asym-Alwali"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
                 GitHub
               </a>
               <Link
-                href="/about"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                href="/dashboard"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
-                About
+                Launch App
               </Link>
             </div>
           </div>
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            Made with focus and determination - 2026 Pulse
-          </p>
+          <div className="mt-8 pt-8 border-t border-slate-700 text-center">
+            <p className="text-sm text-slate-500">
+              Made with ☕ and chaos • © 2026 Pulse
+            </p>
+          </div>
         </div>
       </footer>
+    </div>
+  )
+}
+
+function ProblemCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+}) {
+  return (
+    <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-8 text-center transition-transform hover:-translate-y-1">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center text-slate-600">
+        {icon}
+      </div>
+      <h3 className="text-xl font-bold mb-2">{title}</h3>
+      <p className="text-muted-foreground">{description}</p>
+    </div>
+  )
+}
+
+function SolutionCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+}) {
+  return (
+    <div className="rounded-2xl bg-slate-900 p-8 text-white transition-transform hover:-translate-y-1">
+      <div className="mb-4 flex items-center gap-3">
+        {icon}
+        <h3 className="text-xl font-bold">{title}</h3>
+      </div>
+      <p className="text-slate-300">{description}</p>
     </div>
   )
 }
@@ -245,28 +342,5 @@ function FeatureCard({
       <h3 className="mt-4 font-semibold">{title}</h3>
       <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{description}</p>
     </div>
-  )
-}
-
-function ProblemItem({ title, description }: { title: string; description: string }) {
-  return (
-    <li className="flex gap-4">
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive text-sm font-medium">
-        !
-      </span>
-      <div>
-        <p className="font-medium">{title}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      </div>
-    </li>
-  )
-}
-
-function SolutionItem({ text }: { text: string }) {
-  return (
-    <li className="flex items-center gap-3">
-      <Check className="h-5 w-5 shrink-0 text-green-500" />
-      <span className="text-sm">{text}</span>
-    </li>
   )
 }
